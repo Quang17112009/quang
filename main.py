@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 # Import the keep_alive function
 from keep_alive import keep_alive # Thêm dòng này
 
-API_TOKEN = '7983424898:AAGjKmtUBCL5H-ecT9F3_631xLJT_J7eS_c'
+API_TOKEN = '7878510946:AAEDVvdLI1R2AwfjjYqspGS9IVb2UQ4Tx8s'
 bot = telebot.TeleBot(API_TOKEN)
 ADMIN_ID = [6915752059]
 
