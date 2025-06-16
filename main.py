@@ -555,24 +555,40 @@ def handle_sumclub(call):
 @bot.callback_query_handler(func=lambda call: call.data.startswith('sumclub_'))
 def handle_sumclub_type(call):
     game_type = call.data.split('_')[1] # 'normal' or 'md5'
-    
+
     url = ""
+    game_type_display = "" # Thêm biến này để hiển thị tên game
     if game_type == 'normal':
         url = "https://taixiu.gsum01.com/api/luckydice/GetSoiCau"
+        game_type_display = "Tài Xỉu Thường"
     elif game_type == 'md5':
         url = "https://taixiu1.gsum01.com/api/luckydice1/GetSoiCau"
+        game_type_display = "Tài Xỉu MD5"
     else:
         bot.answer_callback_query(call.id, "Lỗi loại game không xác định.")
         return
 
     try:
+        # --- START DEBUGGING MESSAGES ---
+        bot.send_message(call.message.chat.id, f"DEBUG: Đang yêu cầu dữ liệu cho SumClub {game_type_display} từ URL: `{url}`", parse_mode="Markdown")
+        # --- END DEBUGGING MESSAGES ---
+
         res = requests.get(url)
+
+        # --- START DEBUGGING MESSAGES ---
+        bot.send_message(call.message.chat.id, f"DEBUG: Trạng thái HTTP code từ {url}: {res.status_code}", parse_mode="Markdown")
+        # --- END DEBUGGING MESSAGES ---
+
         if res.status_code != 200:
             raise Exception(f"API lỗi {res.status_code}")
 
         data = res.json()
+        # --- START DEBUGGING MESSAGES ---
+        bot.send_message(call.message.chat.id, f"DEBUG: Dữ liệu JSON nhận được từ {url} (50 ký tự đầu): `{str(data)[:200]}...`", parse_mode="Markdown")
+        # --- END DEBUGGING MESSAGES ---
+
         if not isinstance(data, list) or not data:
-            raise Exception("Không có dữ liệu")
+            raise Exception("Không có dữ liệu hoặc định dạng dữ liệu không phải là list.")
 
         lst = data[:10]
         chuoi = ""
@@ -675,24 +691,7 @@ def handle_sumclub_type(call):
             if 11 <= last_dice <= 13: # This overrides previous predictions if true
                 theo_cau = "X"
 
-        phien = int(data[0]["SessionId"]) + 1
-        game_type_display = "Tài Xỉu Thường" if game_type == 'normal' else "Tài Xỉu MD5"
-
-        # Special rule application: "cứ 2 lần phân tích MD5 cho kết quả 'Gãy' thì sẽ có 1 lần cho kết quả khác."
-        # As discussed before, implementing this requires a persistent state for each user, tracking their "Gãy" count.
-        # This current code is stateless for 'Gãy' count, meaning it resets on each call.
-        # To truly implement this, you would need to store user-specific data (e.g., in wfkey.txt or a separate file/DB).
-        # For demonstration, I will add a placeholder comment here. If you want this implemented,
-        # we need to define what "Gãy" means in this context and how to persist that state.
-        # Example of how it *might* look if 'Gãy' was tracked for MD5 predictions and means flipping the prediction:
-        # if game_type == 'md5':
-        #     user_md5_gãy_count = get_user_md5_gãy_count(call.from_user.id) # Requires implementation
-        #     if user_md5_gãy_count % 3 == 2: # If this is the third prediction after two 'Gãy'
-        #         theo_cau = "X" if theo_cau == "T" else "T"
-        #         # reset_user_md5_gãy_count(call.from_user.id) # Requires implementation
-        #     # else:
-        #         # increment_user_md5_gãy_count(call.from_user.id) # Requires implementation
-
+        phien = int(data[0]["SessionId"]) + 1 # Chắc chắn rằng data[0] tồn tại và có SessionId
 
         nd = f"""
 <b>🔇 Xin Chào Người Đẹp ! Hãy Làm Vài Tay Để Dự ĐoánSumClub Alpha Kéo Bạn Về Bờ Hãy Làm Vài Tay Nào !</b>
@@ -731,7 +730,7 @@ def handle_sumclub_type(call):
         bot.edit_message_text(
             chat_id=call.message.chat.id,
             message_id=call.message.message_id,
-            text=f"Lỗi khi dự đoán cho SumClub ({game_type_display}): {str(e)}"
+            text=f"Lỗi khi dự đoán cho SumClub ({game_type_display}): {str(e)}\n\nVui lòng kiểm tra console để biết thêm chi tiết."
         )
 
 
