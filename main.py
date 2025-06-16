@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 # Import the keep_alive function
 from keep_alive import keep_alive # Thêm dòng này
 
-API_TOKEN = '7878510946:AAEDVvdLI1R2AwfjjYqspGS9IVb2UQ4Tx8s'
+API_TOKEN = '7983424898:AAGjKmtUBCL5H-ecT9F3_631xLJT_J7eS_c'
 bot = telebot.TeleBot(API_TOKEN)
 ADMIN_ID = [6915752059]
 
@@ -30,7 +30,8 @@ def read_wfkey_data():
                     status = parts[3] if len(parts) > 3 else 'Chưa kích hoạt'
                     lock_status = parts[4] if len(parts) > 4 else 'unlock'
                     uids_str = parts[5] if len(parts) > 5 else ''
-                    uids = [u.strip() for uids_str in uids_str.split(",") if uids_str else []] # Fixed split for uids
+                    # Dòng đã được sửa lỗi cú pháp:
+                    uids = [u.strip() for u in uids_str.split(",") if uids_str] if uids_str else []
                     data[key] = {
                         "hsd": hsd,
                         "hwid": hwid,
