@@ -11,7 +11,7 @@ import requests
 from datetime import datetime, timedelta
 from keep_alive import keep_alive
 
-API_TOKEN = '7983424898:AAGjKmtUBCL5H-ecT9F_631xLJT_J7eS_c' # Dùng token của bạn
+API_TOKEN = '7878510946:AAEDVvdLI1R2AwfjjYqspGS9IVb2UQ4Tx8s' # Dùng token của bạn
 bot = telebot.TeleBot(API_TOKEN)
 ADMIN_ID = [6915752059] # ID Admin của bạn
 
